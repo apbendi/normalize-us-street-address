@@ -79,7 +79,8 @@ module StreetAddress
     "corner" => "cor",
     "corners" => "cors",
     "course" => "crse",
-    "court" => "ct",
+    #"court" => "ct",
+    "court" => "f_ct",
     "courts" => "cts",
     "cove" => "cv",
     "coves" => "cvs",
@@ -98,7 +99,9 @@ module StreetAddress
     "crsnt" => "cres",
     "crssing" => "xing",
     "crssng" => "xing",
-    "crt" => "ct",
+    #"crt" => "ct",
+    "crt" => "f_ct",
+    "ct" => "f_ct",
     "curve" => "curv",
     "dale" => "dl",
     "dam" => "dm",
@@ -541,6 +544,12 @@ module StreetAddress
         address['street'] = ''
         address['type'] = ''
         address['number'] = "PO Box #{address['number']}"
+    end
+
+    # Yet another awful hack- change f_ct to Ct
+    # This fixes the collision with CT (Connecticut) #1
+    if address['type'] == 'f_ct'
+        address['type'] = 'Ct'
     end
 
     return address
