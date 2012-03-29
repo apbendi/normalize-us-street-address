@@ -534,7 +534,8 @@ module StreetAddress
 
   def StreetAddress.normalize(result)
     
-    result.map { |x| x.gsub!(/^\s+|\s+$|[^\w\s\-]/s,'') unless x.nil? }
+    #result.map { |x| x.gsub!(/^\s+|\s+$|[^\w\s\-]/s,'') unless x.nil? }
+    result.map { |x| x.gsub!(/^\s+|\s+$|[^\w\s\-]/,'') unless x.nil? }
     
     address = {
             'number' => result[0].to_s,
@@ -557,6 +558,13 @@ module StreetAddress
    #address['city'].gsub!(Regexp.new('^('+RegExs['dircode'].to_s+')\s+(?=\S)'),Directional_code['\1.downcase']) if address['city']
 
     address['zip'].gsub!(/-.*$/s,'') if address['zip']
+
+    # Set a minimum criteria for an address, otherwise return nil
+    if not (address['number'][0] and address['street'] and \
+        address['city'] and address['state'] and address['zip'])
+        puts "SOMETHING MISSING"
+        return nil
+    end
 
     # Part Two of our awful hack to mak PO Boxes work
     # If we recognize this as a faked PO Box, reconstruct it correctly
