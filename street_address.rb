@@ -552,6 +552,11 @@ module StreetAddress
         address['type'] = 'Ct'
     end
 
+    # Uppercase the first letter of the street type, i.e. 'rd' becomes 'Rd', etc...
+    if address['type'][0]
+        address['type'][0] = address['type'][0].upcase
+    end
+
     return address
   end
 
