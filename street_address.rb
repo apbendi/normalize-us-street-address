@@ -488,6 +488,26 @@ module StreetAddress
     'state'   => StateCodes,
   }
 
+  class Address
+    attr_accessor :number, :prefix, :street, :type, :suffix, :city, :state, :zip
+
+    def initialize(addy)
+        @number = addy['number']
+        @prefix = addy['prefix']
+        @street = addy['street']
+        @type = addy['type']
+        @suffix = addy['suffix']
+        @city = addy['city']
+        @state = addy['state']
+        @zip = addy['zip']
+    end
+
+    def to_s
+        return "number=>'#{@number}', prefix=>'#{@prefix}', street=>'#{@street}', type=>'#{@type}', " \
+                + "suffix=>'#{@suffix}', city=>'#{@city}', state=>'#{@state}', zip=>'#{@zip}'"
+    end
+  end
+
   def StreetAddress.output
      RegExs["address"].to_s
   end
@@ -557,7 +577,7 @@ module StreetAddress
         address['type'][0] = address['type'][0].upcase
     end
 
-    return address
+    return Address.new address
   end
 
 end
