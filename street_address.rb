@@ -490,6 +490,15 @@ module StreetAddress
   end
 
   def StreetAddress.parse(address)
+
+    # Awful hack to solve PO Box w/o fully diggin into the underlying
+    # RegEx which are making this all work
+    pobox_num = address.scan(/P[\.\s]*O[\.\s]*Box\s*(\d+)/)
+    if pobox_num
+        # Sub in a fake street place holder if this is actually a PO Box
+        address = address.gsub(/P[\.\s]*O[\.\s]*Box\s*(\d+)/, "#{pobox_num} F_A_K_E Street")
+    end
+
     result = RegExs["address"].match(address).to_a
      if result.nil?
        return false
@@ -526,7 +535,15 @@ module StreetAddress
 
     address['zip'].gsub!(/-.*$/s,'') if address['zip']
 
-    address
+    # Part Two of our awful hack to mak PO Boxes work
+    # If we recognize this as a faked PO Box, reconstruct it correctly
+    if address['street'] == 'F_A_K_E'
+        address['street'] = ''
+        address['type'] = ''
+        address['number'] = "PO Box #{address['number']}"
+    end
+
+    return address
   end
 
 end
