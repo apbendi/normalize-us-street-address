@@ -488,6 +488,8 @@ module StreetAddress
     'state'   => StateCodes,
   }
 
+  # A quick wrapper around our address info
+  # For the sake of handing back a clean Object vs. an Array
   class Address
     attr_accessor :number, :prefix, :street, :type, :suffix, :city, :state, :zip
 
@@ -560,9 +562,8 @@ module StreetAddress
     address['zip'].gsub!(/-.*$/s,'') if address['zip']
 
     # Set a minimum criteria for an address, otherwise return nil
-    if not (address['number'][0] and address['street'] and \
-        address['city'] and address['state'] and address['zip'])
-        puts "SOMETHING MISSING"
+    if not (address['number'][0] and address['street'][0] and \
+        address['city'][0] and address['state'][0] and address['zip'][0])
         return nil
     end
 
@@ -572,6 +573,12 @@ module StreetAddress
         address['street'] = ''
         address['type'] = ''
         address['number'] = "PO Box #{address['number']}"
+    end
+
+    # Safety check for our PO Box Hack, if something's gone wrong
+    # Just return nil rather than an obviously corrupted address
+    if address['street'].match(/F_A_K_E/)
+        return nil
     end
 
     # Yet another awful hack- change f_ct to Ct
