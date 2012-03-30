@@ -156,7 +156,7 @@ module StreetAddress
     "grden" => "gdn",
     "grdn" => "gdn",
     "grdns" => "gdns",
-    "green" => "grn",
+    #"green" => "grn",
     "greens" => "grns",
     "grov" => "grv",
     "grove" => "grv",
