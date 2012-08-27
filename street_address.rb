@@ -518,10 +518,10 @@ module StreetAddress
 
     # Awful hack to solve PO Box w/o fully diggin into the underlying
     # RegEx which are making this all work
-    pobox_num = address.scan(/P[\.\s]*O[\.\s]*Box\s*(\d+)/)
+    pobox_num = address.scan(/P[\.\s]*O[\.\s]*Box\s*(\d+)/i)
     if pobox_num
         # Sub in a fake street place holder if this is actually a PO Box
-        address = address.gsub(/P[\.\s]*O[\.\s]*Box\s*(\d+)/, "#{pobox_num} F_A_K_E Street")
+        address = address.gsub(/P[\.\s]*O[\.\s]*Box\s*(\d+)/i, "#{pobox_num} F_A_K_E Street")
     end
 
     result = RegExs["address"].match(address).to_a
