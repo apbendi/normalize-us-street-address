@@ -516,25 +516,43 @@ module StreetAddress
 
   def StreetAddress.parse(address)
 
-    # Awful hack to solve PO Box w/o fully diggin into the underlying
-    # RegEx which are making this all work
+    # Awful hack to solve PO Box w/o fully digging into the underlying
     pobox_num = address.scan(/P[\.\s]*O[\.\s]*Box\s*(\d+)/i)
-    if pobox_num
+    if pobox_num.length > 0
         # Sub in a fake street place holder if this is actually a PO Box
         address = address.gsub(/P[\.\s]*O[\.\s]*Box\s*(\d+)/i, "#{pobox_num} F_A_K_E Street")
     end
+
+    # The awful hacks continue, this one to solve the problem of numeric highways
+    address =~ /(highway|hwy\.?)\s(\d+)/i
+    hwy_num = $2
+    if hwy_num
+        puts "#{address} hwy_num: #{hwy_num}"
+        address = address.gsub(/(highway|hwy\.?)\s\d+/i, "H_W_Y_N_U_M Street")
+    # If Highway didn't work, repeat the same ugly process with Route
+    else
+        address =~ /(route|rte\.?)\s(\d+)/i
+        hwy_num = $2
+
+        if hwy_num
+            puts "#{address} hwy_num: #{hwy_num}"
+            address = address.gsub(/(route|rte\.?)\s\d+/i, "R_T_E_N_U_M Street")
+        end
+    end
+    
+
 
     result = RegExs["address"].match(address).to_a
      if result.nil?
        return false
      else
         result.shift
-        return StreetAddress.normalize(result)
+        return StreetAddress.normalize(result, hwy_num)
      end
 
   end
 
-  def StreetAddress.normalize(result)
+  def StreetAddress.normalize(result, hwy_num = nil)
     
     #result.map { |x| x.gsub!(/^\s+|\s+$|[^\w\s\-]/s,'') unless x.nil? }
     result.map { |x| x.gsub!(/^\s+|\s+$|[^\w\s\-]/,'') unless x.nil? }
@@ -564,6 +582,7 @@ module StreetAddress
     # Set a minimum criteria for an address, otherwise return nil
     if not (address['number'][0] and address['street'][0] and \
         address['city'][0] and address['state'][0] and address['zip'][0])
+        #puts "Failed: #{address}"
         return nil
     end
 
@@ -578,6 +597,18 @@ module StreetAddress
     # Safety check for our PO Box Hack, if something's gone wrong
     # Just return nil rather than an obviously corrupted address
     if address['street'].match(/F_A_K_E/)
+        return nil
+    end
+
+    # Part two of our highway hack
+    if hwy_num
+        address['street'] = address['street'].gsub(/H_W_Y_N_U_M/, "Highway #{hwy_num}")
+        address['street'] = address['street'].gsub(/R_T_E_N_U_M/, "Route #{hwy_num}")
+        address['type'] = ''
+    end
+
+    # Safety check for the Highway Hack
+    if address['street'].match(/H_W_Y_N_U_M/) or address['street'].match(/R_T_E_N_U_M/)
         return nil
     end
 
