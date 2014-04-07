@@ -527,7 +527,6 @@ module StreetAddress
     address =~ /(highway|hwy\.?)\s(\d+)/i
     hwy_num = $2
     if hwy_num
-        puts "#{address} hwy_num: #{hwy_num}"
         address = address.gsub(/(highway|hwy\.?)\s\d+/i, "H_W_Y_N_U_M Street")
     # If Highway didn't work, repeat the same ugly process with Route
     else
@@ -535,7 +534,6 @@ module StreetAddress
         hwy_num = $2
 
         if hwy_num
-            puts "#{address} hwy_num: #{hwy_num}"
             address = address.gsub(/(route|rte\.?)\s\d+/i, "R_T_E_N_U_M Street")
         end
     end
@@ -582,7 +580,6 @@ module StreetAddress
     # Set a minimum criteria for an address, otherwise return nil
     if not (address['number'][0] and address['street'][0] and \
         address['city'][0] and address['state'][0] and address['zip'][0])
-        #puts "Failed: #{address}"
         return nil
     end
 
